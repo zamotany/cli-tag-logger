@@ -20,7 +20,7 @@ function stringify(value: any): string {
 }
 
 function mergeStringsWithValues(
-  prefix: string | undefined,
+  prefix: (() => string) | undefined,
   strings: TemplateStringsArray,
   values: any[]
 ): string {
@@ -31,7 +31,7 @@ function mergeStringsWithValues(
   );
 
   if (prefix) {
-    segments[0] = prefix;
+    segments[0] = prefix();
   }
 
   for (let i = 0, j = prefix ? 1 : 0; i < strings.length; i++) {
@@ -48,22 +48,23 @@ export const styles = coloretteStyles.reduce((acc, [key, style]) => {
   return {
     ...acc,
     [key]: (strings: TemplateStringsArray, ...values: any[]) => {
+      colorette.options.enabled = !process.env.NO_COLOR;
       return style(mergeStringsWithValues(undefined, strings, values));
     },
   };
 }, {} as { [K in keyof Omit<typeof colorette, 'options'>]: typeof String.raw });
 
-export function createTag(prefix?: string) {
+export function createTag(prefix?: () => string) {
   return (strings: TemplateStringsArray, ...values: any[]): string => {
     return mergeStringsWithValues(prefix, strings, values);
   };
 }
 
-export const debug = createTag(styles.gray`debug `);
-export const info = createTag(styles.blue`info `);
-export const warn = createTag(styles.yellow`warn `);
-export const error = createTag(styles.red`error `);
-export const success = createTag(styles.green`success `);
+export const debug = createTag(() => styles.gray`debug `);
+export const info = createTag(() => styles.blue`info `);
+export const warn = createTag(() => styles.yellow`warn `);
+export const error = createTag(() => styles.red`error `);
+export const success = createTag(() => styles.green`success `);
 export const inspect = createTag();
 export const trace = (
   strings: TemplateStringsArray,
@@ -75,7 +76,7 @@ export const trace = (
   };
   Error.captureStackTrace(err, trace);
   return compose(
-    mergeStringsWithValues(styles.magenta`trace `, strings, values),
+    mergeStringsWithValues(() => styles.magenta`trace `, strings, values),
     err.stack
   );
 };

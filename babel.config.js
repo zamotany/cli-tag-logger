@@ -9,5 +9,10 @@ module.exports = {
         ['@babel/preset-env', { targets: { node: '10' }, modules: 'cjs' }],
       ],
     },
+    test: {
+      presets: [
+        ['@babel/preset-env', { targets: { node: 'current' }, modules: 'cjs' }],
+      ],
+    },
   },
 };
