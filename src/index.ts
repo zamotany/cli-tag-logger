@@ -48,7 +48,7 @@ export const styles = coloretteStyles.reduce((acc, [key, style]) => {
   return {
     ...acc,
     [key]: (strings: TemplateStringsArray, ...values: any[]) => {
-      return style(String.raw(strings, ...values));
+      return style(mergeStringsWithValues(undefined, strings, values));
     },
   };
 }, {} as { [K in keyof Omit<typeof colorette, 'options'>]: typeof String.raw });
@@ -108,7 +108,7 @@ const consolePrint = (message: any) => {
 emitter.on('print', consolePrint);
 
 export type Configuration = {
-  verbose?: boolean;
+  // verbose?: boolean;
   console?: boolean;
   file?: string;
   json?: boolean;
@@ -120,7 +120,7 @@ export function configure(options: Configuration) {
     console: logToConsole = true,
     file,
     json,
-    verbose,
+    // verbose,
     listener,
   } = options;
   if (!logToConsole) {
