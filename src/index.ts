@@ -116,7 +116,7 @@ export type Configuration = {
   listener?: (type: 'print', message: string) => void;
 };
 
-export function configure(options: Configuration) {
+export function configure(options: Configuration): () => void {
   const {
     console: logToConsole = true,
     file,
@@ -124,23 +124,31 @@ export function configure(options: Configuration) {
     // verbose,
     listener,
   } = options;
+  let dispose = () => {};
+
   if (!logToConsole) {
     emitter.removeListener('print', consolePrint);
   }
 
   if (file) {
     const filename = path.isAbsolute(file) ? file : path.resolve(file);
-    emitter.on('print', message => {
+    const fileListener = (message: string) => {
       const data = json
         ? JSON.stringify({ timestamp: new Date(), message: stripAnsi(message) })
         : `${new Date().toJSON()} ${stripAnsi(message)}`;
       fs.appendFileSync(filename, data + '\n');
-    });
+    };
+    emitter.on('print', fileListener);
+    dispose = () => {
+      emitter.off('print', fileListener);
+    };
   }
 
   if (listener) {
     emitter.on('print', listener);
   }
+
+  return dispose;
 }
 
 export function print(...values: ComposableValues) {
