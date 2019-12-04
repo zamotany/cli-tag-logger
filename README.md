@@ -12,7 +12,7 @@ Log messages in CLI apps using tagged template literals.
 
 Install the package:
 ```bash
-yarn add https://github.com/zamotany/cli-tag-logger
+yarn add cli-tag-logger
 ```
 
 Then:
