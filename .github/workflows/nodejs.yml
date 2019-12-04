@@ -1,0 +1,34 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install dependencies
+      uses: Borales/actions-yarn@v2.1.0
+      with:
+        cmd: install --frozen-lockfile
+    - name: Lint
+      uses: Borales/actions-yarn@v2.1.0
+      with:
+        cmd: lint
+    - name: Type check
+      uses: Borales/actions-yarn@v2.1.0
+      with:
+        cmd: typecheck
+    - name: Test
+      uses: Borales/actions-yarn@v2.1.0
+      with:
+        cmd: test
