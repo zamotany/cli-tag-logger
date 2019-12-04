@@ -1,6 +1,13 @@
 name: Node CI
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - '**.png'
+      - '**.sh'
+      - LICENSE
+      - '.vscode/**'
 
 jobs:
   build:
