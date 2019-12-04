@@ -9,6 +9,10 @@ describe('cli-tag-logger', () => {
     process.env.NO_COLOR = '1';
   });
 
+  beforeEach(() => {
+    log.configure({ console: true, file: false });
+  });
+
   it('should provide styling tags', () => {
     expect(log.styles).toMatchSnapshot();
     expect(log.styles.red`hello`).toEqual('hello');
@@ -73,6 +77,7 @@ describe('cli-tag-logger', () => {
 
     log.configure({ console: false, file: path.join(dir, 'out.log') });
     log.print('hello');
+    log.configure({ file: false });
 
     expect(fs.readFileSync(path.join(absDir, 'out.log'), 'utf8')).toMatch(
       'hello'
@@ -92,6 +97,7 @@ describe('cli-tag-logger', () => {
       json: true,
     });
     log.print('hello');
+    log.configure({ file: false });
 
     expect(fs.readFileSync(path.join(absDir, 'out.log'), 'utf8')).toMatch(
       /\{"timestamp":".*","message":"hello"\}/
