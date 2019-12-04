@@ -1,7 +1,6 @@
 # `cli-tag-logger`
 
-[![Version][version]][package] [![MIT License][license-badge]][license]
-<!-- [![Build Status][build-badge]][build] -->
+[![GitHub Workflow Status][build-badge]][build] [![Version][version]][package] [![MIT License][license-badge]][license]
 
 [![PRs Welcome][prs-welcome-badge]][prs-welcome]
 [![Code of Conduct][coc-badge]][coc]
@@ -123,8 +122,8 @@ print('This will be logged in the file');
 
 [version]: https://img.shields.io/npm/v/cli-tag-logger.svg?style=flat-square
 [package]: https://www.npmjs.com/package/cli-tag-logger
-<!-- [build-badge]: https://img.shields.io/circleci/project/github/zamotany/cli-tag-logger/master.svg?style=flat-square -->
-<!-- [build]: https://circleci.com/gh/zamotany/cli-tag-logger -->
+[build]: https://github.com/zamotany/cli-tag-logger/actions
+[build-badge]: https://img.shields.io/github/workflow/status/zamotany/cli-tag-logger/Node%20CI?style=flat-square
 [license-badge]: https://img.shields.io/npm/l/cli-tag-logger.svg?style=flat-square
 [license]: https://opensource.org/licenses/MIT
 [prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
