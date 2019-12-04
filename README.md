@@ -1,5 +1,11 @@
 # `cli-tag-logger`
 
+[![Version][version]][package] [![MIT License][license-badge]][license]
+<!-- [![Build Status][build-badge]][build] -->
+
+[![PRs Welcome][prs-welcome-badge]][prs-welcome]
+[![Code of Conduct][coc-badge]][coc]
+
 Log messages in CLI apps using tagged template literals.
 
 ## Installation & usage
@@ -34,7 +40,7 @@ log.print(
 
 Result:
 
-![screenshot](./screenshot.png)
+![screenshot](https://raw.githubusercontent.com/zamotany/cli-tag-logger/master/screenshot.png)
 
 
 ## API
@@ -68,7 +74,7 @@ const custom = createTag(styles.cyan`custom `);
 print(custom`Hello World`);
 ```
 
-![screenshot](./custom.png)
+![screenshot](https://raw.githubusercontent.com/zamotany/cli-tag-logger/master/custom.png)
 
 ### Styling
 
@@ -81,7 +87,7 @@ console.log(styles.blue`${styles.bold`Hello`}`);
 console.log(styles.green(styles.underline`World`));
 ```
 
-![screenshot](./styles.png)
+![screenshot](https://raw.githubusercontent.com/zamotany/cli-tag-logger/master/styles.png)
 
 ### `print` & `configure`
 
@@ -115,6 +121,13 @@ print('This will be logged in the file');
 
 ```
 
-
-
-
+[version]: https://img.shields.io/npm/v/cli-tag-logger.svg?style=flat-square
+[package]: https://www.npmjs.com/package/cli-tag-logger
+<!-- [build-badge]: https://img.shields.io/circleci/project/github/zamotany/cli-tag-logger/master.svg?style=flat-square -->
+<!-- [build]: https://circleci.com/gh/zamotany/cli-tag-logger -->
+[license-badge]: https://img.shields.io/npm/l/cli-tag-logger.svg?style=flat-square
+[license]: https://opensource.org/licenses/MIT
+[prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
+[prs-welcome]: http://makeapullrequest.com
+[coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square
+[coc]: https://github.com/zamotany/cli-tag-logger/blob/master/CODE_OF_CONDUCT.md
