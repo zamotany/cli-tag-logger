@@ -1,6 +1,6 @@
 {
   "name": "cli-tag-logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Log messages in CLI apps using tagged template literals.",
   "license": "MIT",
   "repository": "https://github.com/zamotany/cli-tag-logger.git",
