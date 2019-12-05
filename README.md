@@ -110,7 +110,7 @@ Logs printed to file will have any styling stripped - no ANSI escape codes will 
 __Example (logging to file)__:
 
 ```js
-const { configure, print } from 'cli-tag-logger';
+import { configure, print } from 'cli-tag-logger';
 
 configure({
   file: './messages.log',
