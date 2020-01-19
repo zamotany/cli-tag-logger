@@ -1,79 +1,63 @@
-import { EventEmitter } from 'events';
 import path from 'path';
 import fs from 'fs';
 import stripAnsi from 'strip-ansi';
+import onExit from 'signal-exit';
 
 import { compose, ComposableValues } from './utils';
 
-export type Configuration = {
-  // verbose?: boolean;
-  console?: boolean;
-  file?: string | false;
-  json?: boolean;
-  listener?: (type: 'print', message: string) => void;
-};
+export abstract class Writer {
+  onPrint(_message: string) {
+    throw new Error('onPrint method from Writer class must be implemented');
+  }
 
-export class Writer {
-  private emitter = new EventEmitter();
-  private filePrint: ((message: any) => void) | undefined;
-  private consolePrint = (message: any) => {
-    console.log(message);
+  print = (...values: ComposableValues) => {
+    this.onPrint(compose(...values));
   };
+}
 
-  constructor() {
-    this.emitter.on('print', this.consolePrint);
-  }
-
-  applyOptions(options: Configuration) {
-    if (
-      options.console &&
-      !this.emitter.listeners('print').includes(this.consolePrint)
-    ) {
-      this.emitter.on('print', this.consolePrint);
-    } else if (options.console === false) {
-      this.emitter.off('print', this.consolePrint);
-    }
-
-    if (options.file) {
-      if (this.filePrint) {
-        this.emitter.off('print', this.filePrint);
-        this.filePrint = undefined;
-      }
-
-      const filename = path.isAbsolute(options.file)
-        ? options.file
-        : path.resolve(options.file);
-      this.filePrint = (message: any) => {
-        const data = options.json
-          ? JSON.stringify({
-              timestamp: new Date(),
-              message: stripAnsi(message),
-            })
-          : `${new Date().toJSON()} ${stripAnsi(message)}`;
-        fs.appendFileSync(filename, data + '\n');
-      };
-      this.emitter.on('print', this.filePrint);
-    } else if (options.file === false && this.filePrint) {
-      this.emitter.off('print', this.filePrint);
-      this.filePrint = undefined;
-    }
-
-    if (options.listener) {
-      this.emitter.on('print', message => options.listener!('print', message));
-    }
-  }
-
-  print(...values: ComposableValues) {
-    this.emitter.emit('print', compose(...values));
+export class ConsoleWriter extends Writer {
+  onPrint(message: string) {
+    console.log(message);
   }
 }
 
-const writer = new Writer();
+export class FileWriter extends Writer {
+  private fd?: number;
 
-export function configure(options: Configuration) {
-  writer.applyOptions(options);
+  constructor(
+    public readonly filename: string,
+    public readonly json: boolean = false
+  ) {
+    super();
+    this.filename = path.isAbsolute(filename)
+      ? filename
+      : path.resolve(filename);
+    this.fd = fs.openSync(this.filename, 'a');
+    onExit(() => {
+      this.fd !== undefined && fs.closeSync(this.fd);
+    });
+  }
+
+  onPrint(message: string) {
+    const data = this.json
+      ? JSON.stringify({
+          timestamp: new Date(),
+          message: stripAnsi(message),
+        })
+      : `${new Date().toJSON()} ${stripAnsi(message)}`;
+    this.fd !== undefined && fs.appendFileSync(this.fd, data + '\n');
+  }
 }
 
-export function print(...values: ComposableValues) {
-  writer.print(...values);
+export class ComposeWriter extends Writer {
+  writers: Writer[];
+
+  constructor(...writers: Writer[]) {
+    super();
+    this.writers = writers;
+  }
+
+  onPrint(message: string) {
+    this.writers.forEach(writer => writer.onPrint(message));
+  }
 }

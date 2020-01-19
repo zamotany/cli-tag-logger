@@ -88,7 +88,7 @@ console.log(styles.green(styles.underline`World`));
 
 ![screenshot](https://raw.githubusercontent.com/zamotany/cli-tag-logger/master/styles.png)
 
-### `print` & `configure`
+### `print`
 
 `print` function is used to print values to `process.stdout`. You can pass multiple values:
 
@@ -98,26 +98,65 @@ import { print, debug } from 'cli-tag-logger';
 print(debug`Hello`, { a: 1, b: 2 });
 ```
 
-`configure` allows to override the default behavior of `print` function. You can specify the following properties to configure the behavior:
+`print` function should be used only if you want to write messages to `process.stdout`. If you wan to customize this behavior use predefined writes or create your own. 
 
-- `console?: boolean` - set `false` to disable printing to the `process.stdout`
-- `file?: string` - pass file name to enable logging to file
-- `json?: boolean` - log messages to file in JSON format
-- `listener?: (type: 'print', message: string) => void` - custom listener for messages (useful for integrating with other logging solutions eg `winston`)
+### Writers
 
-Logs printed to file will have any styling stripped - no ANSI escape codes will be there.
+`Writer` class allows to customize where the messages are written. There are 3 predefined writers:
 
-__Example (logging to file)__:
+- `ConsoleWriter` - writes messages to `process.stdout` (this writer is used by exported `print` function)
+- `FileWriter(filename: string, json: boolean = false)` - writes messages to a file
+- `ComposeWriter` - composes multiple writers together
+  
+and a single abstract class `Writer`.
 
-```js
-import { configure, print } from 'cli-tag-logger';
+To write messages to both `process.stdout` and file you would need to compose both `ConsoleWriter` and `FileWriter`:
 
-configure({
-  file: './messages.log',
-});
+```ts
+import { success, ConsoleWriter, FileWriter, ComposeWriter } from 'cli-tag-logger';
+import path from 'path';
 
-print('This will be logged in the file');
+const { print } = new ComposeWriter(
+  new ConsoleWriter(),
+  new FileWriter('output.log')
+);
 
+print(success`This will be printed in your terminal as well as in ${path.resolve('output.log')}`);
+```
+
+If you want to create your own writer, you need to extend abstract `Writer` class and implement `onPrint` function:
+
+```ts
+import { success, Writer } from 'cli-tag-logger';
+
+class StderrWriter extends Writer {
+  onPrint(message: string) {
+    process.stderr.write(message + '\n');
+  }
+}
+
+const { print } = new StderrWriter();
+
+print(success`This will be printed to process.stderr`);
+```
+
+You can compose your custom writer with predefined ones:
+
+```ts
+import { success, Writer, FileWriter, ComposeWriter  } from 'cli-tag-logger';
+
+class StderrWriter extends Writer {
+  onPrint(message: string) {
+    process.stderr.write(message + '\n');
+  }
+}
+
+const { print } = new ComposeWriter(
+  new StderrWriter(),
+  new FileWriter('output.log')
+);
+
+print(success`This will be printed to process.stderr and to a file`);
 ```
 
 [version]: https://img.shields.io/npm/v/cli-tag-logger.svg?style=flat-square
