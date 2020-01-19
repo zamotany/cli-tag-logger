@@ -59,9 +59,7 @@ Additionally use can use:
 - `trace` - similar to `console.trace`
 - `inspect` - similar to `util.inspect` with some better defaults
 
-By default all logs are written to `process.stdout`. You can override this behavior with `configure` function.
-
-All of the tags returns a strings. You can use provided `print` function, but you can also use `console.log` or anything you want.
+All of the tags return strings. You can use provided [`print`](#print) function, but you can also use `console.log`, [custom writer](#writers) or anything you want. 
 
 If you want to have custom tag, you can use `createTag` function, which accepts `prefix: string` as a first argument and returns a tag function:
 
