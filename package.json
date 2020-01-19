@@ -44,7 +44,9 @@
   },
   "dependencies": {
     "colorette": "^1.1.0",
-    "strip-ansi": "^6.0.0"
+    "restore-cursor": "^3.1.0",
+    "strip-ansi": "^6.0.0",
+    "terminal-kit": "^1.32.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
@@ -56,6 +58,7 @@
     "@types/jest": "^24.0.23",
     "@types/mkdirp": "^0.5.2",
     "@types/node": "10",
+    "@types/terminal-kit": "^1.28.0",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "babel-jest": "^24.9.0",
