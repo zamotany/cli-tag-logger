@@ -33,10 +33,13 @@ export class FileWriter extends Writer {
       ? filename
       : path.resolve(filename);
     this.fd = fs.openSync(this.filename, 'a');
-    onExit(() => {
-      this.fd !== undefined && fs.closeSync(this.fd);
-    });
+    onExit(this.close);
   }
+
+  close = () => {
+    this.fd !== undefined && fs.closeSync(this.fd);
+    this.fd = undefined;
+  };
 
   onPrint(message: string) {
     const data = this.json
