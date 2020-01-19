@@ -9,10 +9,6 @@ describe('cli-tag-logger', () => {
     process.env.NO_COLOR = '1';
   });
 
-  beforeEach(() => {
-    log.configure({ console: true, file: false });
-  });
-
   it('should provide styling tags', () => {
     expect(log.styles).toMatchSnapshot();
     expect(log.styles.red`hello`).toEqual('hello');
@@ -48,7 +44,7 @@ describe('cli-tag-logger', () => {
     ).toEqual('hello debug test 0 { a: 1 } [Function: A]');
   });
 
-  it('should print message', () => {
+  it('should print message to console', () => {
     const _log = console.log;
     console.log = jest.fn();
 
@@ -59,59 +55,59 @@ describe('cli-tag-logger', () => {
     console.log = _log;
   });
 
-  it('should disable print to console', () => {
-    const _log = console.log;
-    console.log = jest.fn();
-
-    log.configure({ console: false });
-    log.print(log.info`hello`, 'world');
-    expect(console.log).not.toHaveBeenCalled();
-
-    console.log = _log;
-  });
-
-  it('should allow printing to file', () => {
+  it('should write message to file', () => {
     const dir = `test/tmp-${(Math.random() * 10000).toFixed(0)}`;
     const absDir = path.resolve(dir);
     mkdir.sync(absDir);
 
-    log.configure({ console: false, file: path.join(dir, 'out.log') });
-    log.print('hello');
-    log.configure({ file: false });
+    const { print, close } = new log.FileWriter(path.join(dir, 'out.log'));
+
+    print('hello');
 
     expect(fs.readFileSync(path.join(absDir, 'out.log'), 'utf8')).toMatch(
       'hello'
     );
 
+    close();
     del.sync(absDir);
   });
 
-  it('should allow printing to file as json', () => {
+  it('should write message to file as json', () => {
     const dir = `test/tmp-${(Math.random() * 10000).toFixed(0)}`;
     const absDir = path.resolve(dir);
     mkdir.sync(absDir);
 
-    log.configure({
-      console: false,
-      file: path.join(dir, 'out.log'),
-      json: true,
-    });
-    log.print('hello');
-    log.configure({ file: false });
+    const { print, close } = new log.FileWriter(
+      path.join(dir, 'out.log'),
+      true
+    );
+
+    print('hello');
 
     expect(fs.readFileSync(path.join(absDir, 'out.log'), 'utf8')).toMatch(
       /\{"timestamp":".*","message":"hello"\}/
     );
 
+    close();
     del.sync(absDir);
   });
 
-  it('should allow to use custom print listener', () => {
-    const listener = jest.fn();
-    log.configure({ console: false, file: undefined, listener });
-    log.print('hello');
+  it('should compose writers', () => {
+    class CustomWriter extends log.Writer {
+      data: string[] = [];
 
-    expect(listener).toHaveBeenCalledTimes(1);
-    expect(listener).toHaveBeenLastCalledWith('print', 'hello');
+      onPrint(message: string) {
+        this.data.push(message);
+      }
+    }
+
+    const writer1 = new CustomWriter();
+    const writer2 = new CustomWriter();
+    const { print } = new log.ComposeWriter(writer1, writer2);
+
+    print('hello');
+
+    expect(writer1.data).toEqual(['hello']);
+    expect(writer2.data).toEqual(['hello']);
   });
 });
