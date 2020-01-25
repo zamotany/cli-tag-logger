@@ -26,7 +26,7 @@ jobs:
     - name: Install dependencies
       uses: Borales/actions-yarn@v2.1.0
       with:
-        cmd: install --frozen-lockfile
+        cmd: install --immutable
     - name: Lint
       uses: Borales/actions-yarn@v2.1.0
       with:
