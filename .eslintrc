@@ -1,6 +1,5 @@
 {
   "extends": [
-    "@callstack/eslint-config/node",
-    "plugin:import/typescript"
+    "@callstack/eslint-config/node"
   ]
 }
