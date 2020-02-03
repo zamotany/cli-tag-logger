@@ -4,14 +4,24 @@ import stripAnsi from 'strip-ansi';
 import onExit from 'signal-exit';
 
 import { compose, ComposableValues } from './utils';
+import { FilterConfig, Tester, createTester } from './filter';
 
 export abstract class Writer {
+  private tester: Tester;
+
+  constructor({ filter }: { filter?: FilterConfig } = {}) {
+    this.tester = createTester(filter);
+  }
+
   onPrint(_message: string) {
     throw new Error('onPrint method from Writer class must be implemented');
   }
 
   print = (...values: ComposableValues) => {
-    this.onPrint(compose(...values));
+    const message = compose(...values);
+    if (this.tester(message)) {
+      this.onPrint(message);
+    }
   };
 }
 
@@ -43,6 +53,10 @@ export function composeWriters<
 }
 
 export class ConsoleWriter extends Writer {
+  constructor({ filter }: { filter?: FilterConfig } = {}) {
+    super({ filter });
+  }
+
   onPrint(message: string) {
     console.log(message);
   }
@@ -50,12 +64,14 @@ export class ConsoleWriter extends Writer {
 
 export class FileWriter extends Writer {
   private fd?: number;
+  public readonly json: boolean;
 
   constructor(
     public readonly filename: string,
-    public readonly json: boolean = false
+    { filter, json }: { filter?: FilterConfig; json?: boolean } = {}
   ) {
-    super();
+    super({ filter });
+    this.json = Boolean(json);
     this.filename = path.isAbsolute(filename)
       ? filename
       : path.resolve(filename);

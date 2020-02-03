@@ -55,6 +55,24 @@ describe('cli-tag-logger', () => {
     console.log = _log;
   });
 
+  it('should print message to console with filters', () => {
+    const _log = console.log;
+    console.log = jest.fn();
+
+    const { print } = new log.ConsoleWriter({
+      filter: {
+        only: 'success',
+      },
+    });
+
+    print(log.info`hello`, 'world');
+    print(log.success`hello`, 'world');
+    expect(console.log).toHaveBeenCalledTimes(1);
+    expect(console.log).toHaveBeenCalledWith('success hello world');
+
+    console.log = _log;
+  });
+
   it('should write message to file', () => {
     const dir = `test/tmp-${(Math.random() * 10000).toFixed(0)}`;
     const absDir = path.resolve(dir);
@@ -77,10 +95,9 @@ describe('cli-tag-logger', () => {
     const absDir = path.resolve(dir);
     mkdir.sync(absDir);
 
-    const { print, close } = new log.FileWriter(
-      path.join(dir, 'out.log'),
-      true
-    );
+    const { print, close } = new log.FileWriter(path.join(dir, 'out.log'), {
+      json: true,
+    });
 
     print('hello');
 

@@ -98,12 +98,71 @@ print(debug`Hello`, { a: 1, b: 2 });
 
 `print` function should be used only if you want to write messages to `process.stdout`. If you wan to customize this behavior use predefined writes or create your own. 
 
+### Filtering messages
+
+Some writers like `ConsoleWriter` support filter messages. You can filter messages for specific tag or exclude unwanted messages.
+
+Writers which support filtering accept an optional `filter` property in their constructor:
+
+```ts
+import { info, debug, success, ConsoleWriter } from 'cli-tag-logger';
+
+const { print } = new ConsoleWriter({
+  filter: {
+    exclude: 'debug',
+  },
+});
+
+print('will be logged');
+print(info`will be logged as well`);
+print(debug`won't be logged`);
+```
+
+`filter` property accepts these properties:
+
+- `only?: LevelTag | LevelTag[]` - if the message matches the value at least a single value (if array is passed), the message will pass filtering and be logged (in case of `ConsoleWriter`)
+- `exclude?: LevelTag | LevelTag[]` - if the message matches the value at least a single value (if array is passed), the message will not pass filtering and won't be logged (in case of `ConsoleWriter`)
+
+If you combine both `only` and `exclude`, the message must satisfy both to pass filtering:
+
+```ts
+import { info, debug, success, ConsoleWriter } from 'cli-tag-logger';
+
+const { print } = new ConsoleWriter({
+  filter: {
+    only: ['debug', 'info', 'success'],
+    exclude: 'debug',
+  },
+});
+
+print(info`will be logged`);
+print(success`will be logged as well`);
+print(debug`won't be logged`);
+```
+
+`LevelTag` can be `debug`, `info`, `success`, `warn`, `error` or RegExp. For custom tags (created using `createTag`) use RegExp:
+
+```ts
+import { createTag ConsoleWriter } from 'cli-tag-logger';
+
+const custom = createTag('custom ');
+
+const { print } = new ConsoleWriter({
+  filter: {
+    only: /^custom/,
+  },
+});
+
+print(custom`will be logged`);
+print(`won't be logged`);
+```
+
 ### Writers
 
 `Writer` class allows to customize where the messages are written. There are 3 predefined writers:
 
-- `ConsoleWriter` - writes messages to `process.stdout` (this writer is used by exported `print` function)
-- `FileWriter(filename: string, json: boolean = false)` - writes messages to a file
+- `ConsoleWriter({ filter }?: { filer?: FilterConfig })` - writes messages to `process.stdout` (this writer is used by exported `print` function); supports filtering
+- `FileWriter(filename: string, { filter, json }?: { filer?: FilterConfig; json?: boolean })` - writes messages to a file; supports filtering
   
 and a single abstract class `Writer`.
 
