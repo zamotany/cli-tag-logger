@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "colorette": "^1.1.0",
+    "fs-extra": "^8.1.0",
     "signal-exit": "^3.0.2",
     "strip-ansi": "^6.0.0"
   },
@@ -54,6 +55,7 @@
     "@babel/preset-typescript": "^7.7.4",
     "@callstack/eslint-config": "^8.0.0",
     "@types/del": "^4.0.0",
+    "@types/fs-extra": "^8.0.1",
     "@types/jest": "^24.0.23",
     "@types/mkdirp": "^0.5.2",
     "@types/node": "10",

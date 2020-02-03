@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
 import stripAnsi from 'strip-ansi';
 import onExit from 'signal-exit';
 
@@ -59,6 +59,7 @@ export class FileWriter extends Writer {
     this.filename = path.isAbsolute(filename)
       ? filename
       : path.resolve(filename);
+    fs.ensureFileSync(this.filename);
     this.fd = fs.openSync(this.filename, 'a');
     onExit(this.close);
   }
