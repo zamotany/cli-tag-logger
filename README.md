@@ -104,23 +104,31 @@ print(debug`Hello`, { a: 1, b: 2 });
 
 - `ConsoleWriter` - writes messages to `process.stdout` (this writer is used by exported `print` function)
 - `FileWriter(filename: string, json: boolean = false)` - writes messages to a file
-- `ComposeWriter` - composes multiple writers together
   
 and a single abstract class `Writer`.
+
+#### Composing writers
+
+You can compose multiple writes together using `composeWriters` function.
+
 
 To write messages to both `process.stdout` and file you would need to compose both `ConsoleWriter` and `FileWriter`:
 
 ```ts
-import { success, ConsoleWriter, FileWriter, ComposeWriter } from 'cli-tag-logger';
+import { success, ConsoleWriter, FileWriter, composeWriters } from 'cli-tag-logger';
 import path from 'path';
 
-const { print } = new ComposeWriter(
+const { print } = composeWriters(
   new ConsoleWriter(),
   new FileWriter('output.log')
 );
 
 print(success`This will be printed in your terminal as well as in ${path.resolve('output.log')}`);
 ```
+
+`composeWriters` function accepts unlimited amount of writers, but the first writer is called a _main_ writer. All of the functions (except for `print` and `onPrint`) from the _main_ writer will be exposed inside returned object.
+
+#### Creating custom writer
 
 If you want to create your own writer, you need to extend abstract `Writer` class and implement `onPrint` function:
 
@@ -141,7 +149,7 @@ print(success`This will be printed to process.stderr`);
 You can compose your custom writer with predefined ones:
 
 ```ts
-import { success, Writer, FileWriter, ComposeWriter  } from 'cli-tag-logger';
+import { success, Writer, FileWriter, composeWriters  } from 'cli-tag-logger';
 
 class StderrWriter extends Writer {
   onPrint(message: string) {
@@ -149,7 +157,7 @@ class StderrWriter extends Writer {
   }
 }
 
-const { print } = new ComposeWriter(
+const { print } = composeWriters(
   new StderrWriter(),
   new FileWriter('output.log')
 );

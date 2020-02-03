@@ -103,7 +103,7 @@ describe('cli-tag-logger', () => {
 
     const writer1 = new CustomWriter();
     const writer2 = new CustomWriter();
-    const { print } = new log.ComposeWriter(writer1, writer2);
+    const { print } = log.composeWriters(writer1, writer2);
 
     print('hello');
 
