@@ -2,6 +2,8 @@ import path from 'path';
 import fs from 'fs-extra';
 import stripAnsi from 'strip-ansi';
 import onExit from 'signal-exit';
+import spinners from 'cli-spinners';
+import { terminal } from 'terminal-kit';
 
 import { compose, ComposableValues } from './utils';
 import { FilterConfig, Tester, createTester } from './filter';
@@ -94,4 +96,89 @@ export class FileWriter extends Writer {
       : `${new Date().toJSON()} ${stripAnsi(message)}`;
     this.fd !== undefined && fs.appendFileSync(this.fd, data + '\n');
   }
+}
+
+type SpinnerOptions = {
+  type?: spinners.SpinnerName;
+  interval?: number;
+};
+
+export class InteractiveWriter extends Writer {
+  private interval: NodeJS.Timeout | undefined;
+  private message: string = '';
+  private frame: string = '';
+  private running: boolean = false;
+  private messageMaxLength: number;
+
+  constructor() {
+    super();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { default: _, ...spinnerTypes } = spinners;
+    const longestSpinnerFrameLength = Object.values(
+      (spinnerTypes as unknown) as Record<string, spinners.Spinner>
+    ).reduce((length, spinner) => {
+      return Math.max(length, ...spinner.frames.map(frame => frame.length));
+    }, 0);
+    this.messageMaxLength = terminal.width - longestSpinnerFrameLength - 1;
+  }
+
+  private truncateMessage(message: string) {
+    const [messageFirstLine] = message.split('\n');
+    return messageFirstLine.slice(0, this.messageMaxLength);
+  }
+
+  private clearAndResetCursor() {
+    terminal.eraseLine();
+    terminal.move(-terminal.width, 0);
+  }
+
+  private draw() {
+    if (this.running) {
+      this.clearAndResetCursor();
+      terminal(this.frame, ' ', this.message);
+    }
+  }
+
+  onPrint(message: string) {
+    this.clearAndResetCursor();
+    terminal(message + '\n');
+    this.draw();
+  }
+
+  startSpinner = (
+    message: string,
+    { type = 'line', interval = spinners[type].interval }: SpinnerOptions = {}
+  ) => {
+    let frameKey = 0;
+    this.message = this.truncateMessage(message);
+
+    terminal.hideCursor(true);
+
+    onExit(() => {
+      terminal.hideCursor(false);
+    });
+
+    this.running = true;
+    this.interval = setInterval(() => {
+      this.frame = spinners[type].frames[frameKey];
+      frameKey++;
+      frameKey = frameKey >= spinners[type].frames.length ? 0 : frameKey;
+      this.draw();
+    }, interval);
+  };
+
+  updateSpinner = (...values: ComposableValues) => {
+    this.message = this.truncateMessage(compose(...values));
+  };
+
+  stopSpinner = (...values: ComposableValues) => {
+    this.running = false;
+    if (values.length > 0) {
+      this.print(...values);
+    } else {
+      this.clearAndResetCursor();
+    }
+    terminal.hideCursor(false);
+    this.interval && clearInterval(this.interval);
+  };
 }

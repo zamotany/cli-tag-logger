@@ -45,3 +45,46 @@ Object {
   "yellowBright": [Function],
 }
 `;
+
+exports[`cli-tag-logger should render spinner 1`] = `
+Array [
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: message 1
+",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: - start",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: message 2
+",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: - start",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: \\\\ start",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: | start",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: / update",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: - update",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: \\\\ update",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: | update",
+  "eraseLine: ",
+  "move: -1000",
+  "eraseLine: ",
+  "move: -1000",
+  "terminal: message 3
+",
+]
+`;

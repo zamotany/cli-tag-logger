@@ -40,17 +40,21 @@
     "watch": "yarn clean && concurrently \"yarn build:cjs --watch\" \"yarn build:ts --watch --preserveWatchOutput\"",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext '.ts' src",
-    "test": "jest"
+    "test": "jest",
+    "example": "cd example && ../node_modules/.bin/babel-node --extensions .ts --env-name test --config-file ../babel.config.js"
   },
   "dependencies": {
+    "cli-spinners": "^2.2.0",
     "colorette": "^1.1.0",
     "fs-extra": "^8.1.0",
     "signal-exit": "^3.0.2",
-    "strip-ansi": "^6.0.0"
+    "strip-ansi": "^6.0.0",
+    "terminal-kit": "^1.32.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
+    "@babel/node": "^7.8.4",
     "@babel/preset-env": "^7.7.4",
     "@babel/preset-typescript": "^7.7.4",
     "@callstack/eslint-config": "^8.0.0",
@@ -60,6 +64,7 @@
     "@types/mkdirp": "^0.5.2",
     "@types/node": "10",
     "@types/signal-exit": "^3.0.0",
+    "@types/terminal-kit": "^1.28.0",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "babel-jest": "^24.9.0",

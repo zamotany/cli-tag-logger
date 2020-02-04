@@ -3,6 +3,11 @@ import del from 'del';
 import path from 'path';
 import fs from 'fs';
 import * as log from '../src';
+import { terminal } from 'terminal-kit';
+
+jest.mock('terminal-kit', () => ({
+  terminal: jest.fn(),
+}));
 
 describe('cli-tag-logger', () => {
   beforeAll(() => {
@@ -127,4 +132,62 @@ describe('cli-tag-logger', () => {
     expect(writer1.data).toEqual(['hello']);
     expect(writer2.data).toEqual(['hello']);
   });
+
+  it('should render spinner', () =>
+    new Promise(resolve => {
+      const actions = [];
+
+      ((terminal as unknown) as jest.Mock).mockImplementation((...args) => {
+        actions.push(['terminal', args]);
+      });
+      terminal.width = 100;
+      ((terminal as unknown) as jest.Mock & {
+        eraseLine: Function;
+      }).eraseLine = jest.fn((...args) => {
+        actions.push(['eraseLine', args]);
+      });
+      ((terminal.move as unknown) as jest.Mock) = jest.fn((...args) => {
+        actions.push(['move', args]);
+      });
+      ((terminal as unknown) as jest.Mock & {
+        hideCursor: Function;
+      }).hideCursor = jest.fn();
+
+      const {
+        print,
+        startSpinner,
+        stopSpinner,
+        updateSpinner,
+      } = log.composeWriters(new log.InteractiveWriter());
+
+      print('message 1');
+
+      startSpinner('start', { interval: 5 });
+
+      setTimeout(() => {
+        print('message 2');
+      }, 10);
+
+      setTimeout(() => {
+        updateSpinner('update');
+      }, 20);
+
+      setTimeout(() => {
+        stopSpinner();
+        print('message 3');
+
+        expect(terminal.eraseLine).toHaveBeenCalledTimes(12);
+        expect(terminal.move).toHaveBeenCalledTimes(12);
+        expect(terminal).toHaveBeenCalledTimes(11);
+        expect(terminal.hideCursor).toHaveBeenCalledTimes(2);
+
+        expect(
+          actions.map(item => `${item[0]}: ${item[1].join('')}`)
+        ).toMatchSnapshot();
+
+        resolve();
+      }, 40);
+
+      expect(true).toBe(true);
+    }));
 });
