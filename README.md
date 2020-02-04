@@ -42,6 +42,20 @@ Result:
 ![screenshot](https://raw.githubusercontent.com/zamotany/cli-tag-logger/master/screenshot.png)
 
 
+## Examples
+
+You can start examples from `examples/` directory running:
+
+```bash
+yarn example <example_name>
+```
+
+For instance:
+
+```
+yarn example spinners
+```
+
 ## API
 
 ### Logging
