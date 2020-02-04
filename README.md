@@ -7,6 +7,10 @@
 
 Log messages in CLI apps using tagged template literals.
 
+<p align="center">
+  <img alt="Showcase GIF" src="https://raw.githubusercontent.com/zamotany/cli-tag-logger/master/cli_tag_logger_showcase.gif" width="512">
+</p>
+
 ## Installation & usage
 
 Install the package:
