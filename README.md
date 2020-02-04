@@ -163,6 +163,7 @@ print(`won't be logged`);
 
 - `ConsoleWriter({ filter }?: { filer?: FilterConfig })` - writes messages to `process.stdout` (this writer is used by exported `print` function); supports filtering
 - `FileWriter(filename: string, { filter, json }?: { filer?: FilterConfig; json?: boolean })` - writes messages to a file; supports filtering
+- `InteractiveWriter` - writes messages to `process.stdout` and draws spinner at the bottom
   
 and a single abstract class `Writer`.
 
@@ -186,6 +187,42 @@ print(success`This will be printed in your terminal as well as in ${path.resolve
 ```
 
 `composeWriters` function accepts unlimited amount of writers, but the first writer is called a _main_ writer. All of the functions (except for `print` and `onPrint`) from the _main_ writer will be exposed inside returned object.
+
+
+Take `InteractiveWriter` for example - it has additional 3 methods: `start`, `update` and `stop`. If `InteractiveWriter` is the _main_ writer, all of those 3 functions will be available for you:
+
+```ts
+import { info, InteractiveWriter, FileWriter, composeWriters } from 'cli-tag-logger';
+
+const { print, start, update, stop } = composeWriters(
+  new InteractiveWriter(),
+  new FileWriter()
+);
+
+print(info`Hello`)
+start(info`I'm spinning`);
+
+setTimeout(() => {
+  update(info`I'm getting dizzy...`);
+}, 1000);
+
+setTimeout(() => {
+  stop();
+}, 2000);
+```
+
+However if you change the order and `FileWriter` will come first, only `print` function will be exposed, since this is the only function that `FileWriter` provides:
+
+```ts
+import { info, InteractiveWriter, FileWriter, composeWriters } from 'cli-tag-logger';
+
+const { print } = composeWriters(
+  new FileWriter(),
+  new InteractiveWriter()
+);
+
+print(info`I'm the only function available`);
+```
 
 #### Creating custom writer
 
