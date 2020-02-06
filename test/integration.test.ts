@@ -193,7 +193,7 @@ describe('cli-tag-logger', () => {
         ).toMatchSnapshot();
 
         resolve();
-      }, 45);
+      }, 40);
 
       expect(true).toBe(true);
     }));
