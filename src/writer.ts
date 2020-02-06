@@ -110,8 +110,8 @@ export class InteractiveWriter extends Writer {
   private running: boolean = false;
   private messageMaxLength: number;
 
-  constructor() {
-    super();
+  constructor({ filter }: { filter?: FilterConfig } = {}) {
+    super({ filter });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { default: _, ...spinnerTypes } = spinners;
     const longestSpinnerFrameLength = Object.values(
