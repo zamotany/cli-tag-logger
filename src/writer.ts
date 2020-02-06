@@ -140,7 +140,6 @@ export class InteractiveWriter extends Writer {
   }
 
   onPrint(message: string) {
-    debugger;
     this.clearAndResetCursor();
     terminal(message + '\n');
     this.draw();
