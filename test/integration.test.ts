@@ -158,9 +158,16 @@ describe('cli-tag-logger', () => {
         startSpinner,
         stopSpinner,
         updateSpinner,
-      } = log.composeWriters(new log.InteractiveWriter());
+      } = log.composeWriters(
+        new log.InteractiveWriter({
+          filter: {
+            exclude: 'debug',
+          },
+        })
+      );
 
       print('message 1');
+      print(log.debug`should not be logged`);
 
       startSpinner('start', { interval: 5 });
 
@@ -186,7 +193,7 @@ describe('cli-tag-logger', () => {
         ).toMatchSnapshot();
 
         resolve();
-      }, 40);
+      }, 45);
 
       expect(true).toBe(true);
     }));
